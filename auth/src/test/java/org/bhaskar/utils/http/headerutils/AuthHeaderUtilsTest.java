@@ -25,7 +25,7 @@ class AuthHeaderUtilsTest {
         class NegativeTests {
             @BeforeEach
             void setupEmpty() {
-                expected = new AuthHeaderUtils.BasicAuthCredentials("", "");
+                expected = AuthHeaderUtils.BasicAuthCredentials.EMPTY_CREDENTIALS;
             }
 
             @Test

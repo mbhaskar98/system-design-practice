@@ -69,7 +69,7 @@ public record AuthHeaderUtils() {
         } catch (IllegalArgumentException e) {
             log.error("Error while decoding:{}, exception:{}", authorizationHeader, e.getMessage());
         }
-        return new BasicAuthCredentials("", "");
+        return BasicAuthCredentials.EMPTY_CREDENTIALS;
     }
 
     private enum AuthScheme {
@@ -80,5 +80,6 @@ public record AuthHeaderUtils() {
 
     public record BasicAuthCredentials(String email,
                                        String password) {
+        public static BasicAuthCredentials EMPTY_CREDENTIALS = new BasicAuthCredentials("", "");
     }
 }
