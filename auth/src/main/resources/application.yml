@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/auth
+    username: auth_user
+    password: Auth@123
+  jpa:
+    show-sql: "true"
+    open-in-view: "true"
+    properties:
+      hibernate:
+        dialect:
+          org.hibernate.dialect.MySQL5InnoDB Dialect:
+        format_sql: "true"
+        ddl-auto: update
+
