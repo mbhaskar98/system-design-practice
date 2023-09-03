@@ -9,13 +9,12 @@ import org.junit.jupiter.api.Test;
 
 class AuthHeaderUtilsTest {
 
-    private AuthHeaderUtils authHeaderUtils;
+    final private AuthHeaderUtils authHeaderUtils;
     private AuthHeaderUtils.BasicAuthCredentials expected;
     private AuthHeaderUtils.BasicAuthCredentials actual;
 
 
-    @BeforeEach
-    void setup() {
+    AuthHeaderUtilsTest() {
         authHeaderUtils = new AuthHeaderUtils();
     }
 
