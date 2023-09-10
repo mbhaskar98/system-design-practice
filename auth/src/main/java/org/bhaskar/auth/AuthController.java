@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v1/login")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     UserService userService;
@@ -32,7 +32,7 @@ public class AuthController {
     private String secret;
 
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<Response<LoginResponse>> login(
             @Nullable @RequestHeader("Authorization") String authorizationHeader) {
         // Empty authorization header
