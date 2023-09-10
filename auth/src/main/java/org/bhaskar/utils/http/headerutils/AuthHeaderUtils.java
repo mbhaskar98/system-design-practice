@@ -9,7 +9,7 @@ import java.util.Base64;
 
 @Slf4j
 @Component
-public record AuthHeaderUtils() {
+public class AuthHeaderUtils {
 
     private static final String basicAuthPrefix = "Basic ";
 
