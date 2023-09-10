@@ -1,4 +1,4 @@
-package org.bhaskar;
+package org.bhaskar.response;
 
 import org.bhaskar.dto.Response;
 import org.junit.jupiter.api.*;

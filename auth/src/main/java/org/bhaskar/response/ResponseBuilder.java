@@ -1,4 +1,4 @@
-package org.bhaskar;
+package org.bhaskar.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
