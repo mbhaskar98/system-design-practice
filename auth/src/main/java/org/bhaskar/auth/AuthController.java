@@ -55,7 +55,7 @@ public class AuthController {
                     .getResponse();
         }
 
-        LoginResponse loginResponse = authService.generateJWTResponseForUser(user, "prod-secret");
+        LoginResponse loginResponse = authService.generateJWTResponseForUser(user, "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n");
         // Return JWT
         return ResponseBuilder
                 .<LoginResponse>getSuccessResponseBuilder()

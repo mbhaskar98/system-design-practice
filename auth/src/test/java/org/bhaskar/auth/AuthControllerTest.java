@@ -104,7 +104,7 @@ class AuthControllerTest {
                     .thenReturn(mockCredentials);
             Mockito.when(userService.findByEmail(email))
                     .thenReturn(mockUser);
-            Mockito.when(authService.generateJWTResponseForUser(mockUser, "prod-secret")).thenReturn(mockLoginResponse);
+            Mockito.when(authService.generateJWTResponseForUser(mockUser, "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n")).thenReturn(mockLoginResponse);
         }
 
         @Test

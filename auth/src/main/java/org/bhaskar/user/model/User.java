@@ -3,11 +3,12 @@ package org.bhaskar.user.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 @Entity
 public class User {
     @Id

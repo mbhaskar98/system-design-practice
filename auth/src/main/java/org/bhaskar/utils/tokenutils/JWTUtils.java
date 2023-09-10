@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
+@Component
 public class JWTUtils {
     /**
      * Create a jwt token based {@code user} and {@code isAdmin} as claims
