@@ -13,11 +13,11 @@ public class ResponseBuilder<T> implements ResponseInterface<T> {
     @Getter
     private HttpStatus httpStatus;
     @Getter
-    private Response.status responeStatus;
+    private Response.status responeStatus = Response.status.SUCCESS;
     @Getter
-    private T data;
+    private T data = null;
     @Getter
-    private String message;
+    private String message = "";
 
     public static <E> ResponseBuilder.ResponseBuilderBuilder<E> getErrorResponseBuilder() {
         return ResponseBuilder
@@ -34,12 +34,7 @@ public class ResponseBuilder<T> implements ResponseInterface<T> {
     }
 
     public ResponseEntity<Response<T>> getResponse() {
-        Response<T> response = Response
-                .<T>builder()
-                .data(data)
-                .status(responeStatus)
-                .message(message)
-                .build();
+        Response<T> response = new Response<>(responeStatus, message, data);
         return ResponseEntity.status(httpStatus).body(response);
     }
 }
