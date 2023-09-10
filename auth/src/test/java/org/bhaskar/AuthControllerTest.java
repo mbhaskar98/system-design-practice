@@ -1,7 +1,10 @@
 package org.bhaskar;
 
 import org.bhaskar.dao.User;
+import org.bhaskar.dto.LoginResponse;
+import org.bhaskar.utils.AuthService;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;
+import org.bhaskar.utils.http.headerutils.AuthHeaderUtils.BasicAuthCredentials;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,8 @@ class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private AuthService authService;
 
     @Nested
     class NegativeTests {
@@ -73,25 +78,59 @@ class AuthControllerTest {
         private final String email;
         private final String password;
 
+        private final boolean isAdmin;
+        private String token;
+
+        // Mock objects
+        private BasicAuthCredentials mockCredentials;
+        private User mockUser;
+        private LoginResponse mockLoginResponse;
+
+        private String authHeader;
+
         PositiveTests() {
             this.email = "email";
             this.password = "password";
+            this.token = "token";
+            this.isAdmin = false;
+        }
+
+        void mockObjects() {
+            BasicAuthCredentials mockCredentials = new BasicAuthCredentials(email, password);
+            User mockUser = new User(1, email, password, isAdmin);
+            LoginResponse mockLoginResponse = new LoginResponse(token);
+            authHeader = "Basic ZW1haWw6cGFzc3dvcmQ=";
+            Mockito.when(headerUtils.extractBasicAuthUserCredentials(authHeader))
+                    .thenReturn(mockCredentials);
+            Mockito.when(userService.findByEmail(email))
+                    .thenReturn(mockUser);
+            Mockito.when(authService.generateJWTResponseForUser(mockUser)).thenReturn(mockLoginResponse);
         }
 
         @Test
         @DisplayName("success")
         void successResponse() throws Exception {
-            String authHeader = "Basic ZW1haWw6cGFzc3dvcmQ=";
-
-            Mockito.when(headerUtils.extractBasicAuthUserCredentials(authHeader))
-                    .thenReturn(new AuthHeaderUtils.BasicAuthCredentials(email, password));
-            Mockito.when(userService.findByEmail("email"))
-                    .thenReturn(new User(1, email, password));
+            mockObjects();
             mockMvc.perform(MockMvcRequestBuilders
                             .post("/api/v1/login")
                             .header("Authorization", authHeader))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.content().json("{'status':'SUCCESS','message':'','data':" + email + "}"));
+                    .andExpect(MockMvcResultMatchers.content().json("{'status':'SUCCESS','message':'','data': {'token' : '" + token + "'}}"));
         }
+
+        @Test
+        @DisplayName("return jwt token")
+        void validJWT() throws Exception {
+            token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+                    "eyJ1c2VybmFtZSI6ImJoYXNrYXIiLCJhZG1pbiI6dHJ1ZSwianRpIjoiMTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTExIiwiaWF0IjoxMDAsImV4cCI6MjAwfQ." +
+                    "wBZ-6qWQsesc5IgaNCS-MBgA7Q54natY_jVJOguP3JY";
+            mockObjects();
+            mockMvc.perform(MockMvcRequestBuilders
+                            .post("/api/v1/login")
+                            .header("Authorization", authHeader))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json("{'status':'SUCCESS','message':'','data': {'token' : '" + token + "'}}"));
+        }
+
     }
 }

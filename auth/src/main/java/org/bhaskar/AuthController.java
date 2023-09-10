@@ -2,7 +2,9 @@ package org.bhaskar;
 
 import jakarta.annotation.Nullable;
 import org.bhaskar.dao.User;
+import org.bhaskar.dto.LoginResponse;
 import org.bhaskar.dto.Response;
+import org.bhaskar.utils.AuthService;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils.BasicAuthCredentials;
 import org.springframework.http.HttpStatus;
@@ -16,16 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/login")
 public record AuthController(UserService userService,
-                             AuthHeaderUtils headerUtils) {
+                             AuthHeaderUtils headerUtils,
+                             AuthService authService
+) {
 
 
     @PostMapping
-    public ResponseEntity<Response<String>> login(
+    public ResponseEntity<Response<LoginResponse>> login(
             @Nullable @RequestHeader("Authorization") String authorizationHeader) {
         // Empty authorization header
         if (authorizationHeader == null || authorizationHeader.isEmpty()) {
             return ResponseBuilder
-                    .<String>getErrorResponseBuilder()
+                    .<LoginResponse>getErrorResponseBuilder()
                     .message("missing credentials")
                     .httpStatus(HttpStatus.UNAUTHORIZED)
                     .build()
@@ -39,17 +43,18 @@ public record AuthController(UserService userService,
         // Wrong credentials
         if (user == null || !user.getPassword().equals(password)) {
             return ResponseBuilder
-                    .<String>getErrorResponseBuilder()
+                    .<LoginResponse>getErrorResponseBuilder()
                     .message("invalid credentials")
                     .httpStatus(HttpStatus.UNAUTHORIZED)
                     .build()
                     .getResponse();
         }
 
+        LoginResponse loginResponse = authService.generateJWTResponseForUser(user);
         // Return JWT
         return ResponseBuilder
-                .<String>getSuccessResponseBuilder()
-                .data(user.getEmail())
+                .<LoginResponse>getSuccessResponseBuilder()
+                .data(loginResponse)
                 .message("")
                 .httpStatus(HttpStatus.OK)
                 .build()
