@@ -18,3 +18,5 @@ spring:
         format_sql: "true"
         ddl-auto: update
 
+jwt:
+  secret: dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n

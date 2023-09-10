@@ -10,14 +10,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
 @WebMvcTest(controllers = AuthController.class)
+@ActiveProfiles("test")
 class AuthControllerTest {
 
     @MockBean
@@ -88,6 +91,9 @@ class AuthControllerTest {
 
         private String authHeader;
 
+        @Value("${jwt.secret}")
+        private String secret;
+
         PositiveTests() {
             this.email = "email";
             this.password = "password";
@@ -104,7 +110,8 @@ class AuthControllerTest {
                     .thenReturn(mockCredentials);
             Mockito.when(userService.findByEmail(email))
                     .thenReturn(mockUser);
-            Mockito.when(authService.generateJWTResponseForUser(mockUser, "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n")).thenReturn(mockLoginResponse);
+            Mockito.when(authService.generateJWTResponseForUser(mockUser, secret))
+                    .thenReturn(mockLoginResponse);
         }
 
         @Test

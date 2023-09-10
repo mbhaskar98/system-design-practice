@@ -9,6 +9,7 @@ import org.bhaskar.user.model.User;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils.BasicAuthCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,9 @@ public class AuthController {
     AuthHeaderUtils headerUtils;
     @Autowired
     AuthService authService;
+
+    @Value("${jwt.secret}")
+    private String secret;
 
 
     @PostMapping
@@ -55,7 +59,7 @@ public class AuthController {
                     .getResponse();
         }
 
-        LoginResponse loginResponse = authService.generateJWTResponseForUser(user, "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n");
+        LoginResponse loginResponse = authService.generateJWTResponseForUser(user, secret);
         // Return JWT
         return ResponseBuilder
                 .<LoginResponse>getSuccessResponseBuilder()
