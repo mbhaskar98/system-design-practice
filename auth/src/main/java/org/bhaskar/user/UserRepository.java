@@ -1,4 +1,4 @@
-package org.bhaskar;
+package org.bhaskar.user;
 
 import org.bhaskar.dao.User;
 import org.springframework.data.jpa.repository.JpaRepository;
