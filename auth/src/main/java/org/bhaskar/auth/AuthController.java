@@ -1,7 +1,7 @@
 package org.bhaskar.auth;
 
 import jakarta.annotation.Nullable;
-import org.bhaskar.dao.User;
+import org.bhaskar.model.User;
 import org.bhaskar.response.ResponseBuilder;
 import org.bhaskar.response.dto.LoginResponse;
 import org.bhaskar.response.dto.Response;

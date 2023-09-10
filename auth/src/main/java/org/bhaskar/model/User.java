@@ -1,4 +1,4 @@
-package org.bhaskar.dao;
+package org.bhaskar.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

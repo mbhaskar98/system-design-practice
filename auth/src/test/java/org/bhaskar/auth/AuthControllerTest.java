@@ -1,6 +1,6 @@
 package org.bhaskar.auth;
 
-import org.bhaskar.dao.User;
+import org.bhaskar.model.User;
 import org.bhaskar.response.dto.LoginResponse;
 import org.bhaskar.user.UserService;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;

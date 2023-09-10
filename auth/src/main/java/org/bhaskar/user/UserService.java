@@ -1,6 +1,6 @@
 package org.bhaskar.user;
 
-import org.bhaskar.dao.User;
+import org.bhaskar.model.User;
 import org.springframework.stereotype.Service;
 
 @Service
