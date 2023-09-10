@@ -3,6 +3,7 @@ package org.bhaskar.dao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,9 @@ public class User {
             generator = "user_id_sequence"
     )
     private Integer id;
+    @NonNull
     private String email;
+    @NonNull
     private String password;
+    private boolean isAdmin;
 }
