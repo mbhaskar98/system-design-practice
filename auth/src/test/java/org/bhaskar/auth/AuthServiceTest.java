@@ -1,8 +1,8 @@
 package org.bhaskar.auth;
 
 import org.assertj.core.api.Assertions;
-import org.bhaskar.model.User;
 import org.bhaskar.response.dto.LoginResponse;
+import org.bhaskar.user.model.User;
 import org.bhaskar.utils.tokenutils.JWTUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

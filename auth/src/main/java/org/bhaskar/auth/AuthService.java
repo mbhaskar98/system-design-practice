@@ -1,7 +1,7 @@
 package org.bhaskar.auth;
 
-import org.bhaskar.model.User;
 import org.bhaskar.response.dto.LoginResponse;
+import org.bhaskar.user.model.User;
 import org.bhaskar.utils.tokenutils.JWTUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

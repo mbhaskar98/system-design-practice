@@ -1,8 +1,8 @@
 package org.bhaskar.auth;
 
-import org.bhaskar.model.User;
 import org.bhaskar.response.dto.LoginResponse;
 import org.bhaskar.user.UserService;
+import org.bhaskar.user.model.User;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils.BasicAuthCredentials;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package org.bhaskar.model;
+package org.bhaskar.user.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
