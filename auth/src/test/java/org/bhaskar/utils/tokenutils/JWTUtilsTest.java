@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 class JWTUtilsTest {
@@ -59,6 +62,18 @@ class JWTUtilsTest {
                 Assertions.assertThat(jwtUtils.createJWT(userName, secret, isAdmin))
                         .isEqualTo("");
             }
+
+            @Test
+            void invalidBase64Secret() {
+                Assertions.assertThat(jwtUtils.createJWT(userName, "dGVzdCBzZWNyZXQ=1234567890", isAdmin))
+                        .isEqualTo("");
+            }
+
+            @Test
+            void smallSecretKeyLength() {
+                Assertions.assertThat(jwtUtils.createJWT(userName, "dGVzdCBzZWNyZXQ=", isAdmin))
+                        .isEqualTo("");
+            }
         }
 
         @Nested
@@ -71,7 +86,22 @@ class JWTUtilsTest {
 
             PositiveTests() {
                 userName = "bhaskar";
-                secret = "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgaXMgdmVyeSBsb25n";
+
+                // Get the classloader for the current class
+                ClassLoader classLoader = getClass().getClassLoader();
+
+                // Specify the path to the resource file
+                String resourcePath = "application-test.yml"; // Replace with the actual resource path
+
+                try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
+                    Yaml yaml = new Yaml();
+                    Map<String, Object> data = yaml.load(inputStream);
+                    System.out.println(((Map<String, Object>) data.get("jwt")).get("secret"));
+                    secret = ((Map<String, Object>) data.get("jwt")).get("secret").toString();
+                } catch (Exception e) {
+                    System.out.println("Error" + e.getMessage());
+                    throw new RuntimeException(e);
+                }
                 isAdmin = false;
                 issuedAt = Date.from(Instant.ofEpochSecond(100));
                 expiration = Date.from(Instant.ofEpochSecond(200));
@@ -101,9 +131,7 @@ class JWTUtilsTest {
             void emptyUsername() {
                 mockStaticMethodsAndTest(() -> {
                     Assertions.assertThat(jwtUtils.createJWT("", secret, isAdmin))
-                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" +
-                                    ".eyJ1c2VybmFtZSI6IiIsImFkbWluIjpmYWxzZSwianRpIjoiMTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTExIiwiaWF0IjoxMDAsImV4cCI6MjAwfQ." +
-                                    "yB9ovnns6MSog4Keo9hCaS4MwCWsNgczkKIYq2sD5SA");
+                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IiIsImFkbWluIjpmYWxzZSwianRpIjoiMTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTExIiwiaWF0IjoxMDAsImV4cCI6MjAwfQ.I5wvwhInKIzmQSTsn_2i0DrzsVRkoyJyByFhOoeXhIc");
                 });
             }
 
@@ -112,9 +140,7 @@ class JWTUtilsTest {
             void someUsername() {
                 mockStaticMethodsAndTest(() -> {
                     Assertions.assertThat(jwtUtils.createJWT(userName, secret, isAdmin))
-                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
-                                    "eyJ1c2VybmFtZSI6ImJoYXNrYXIiLCJhZG1pbiI6ZmFsc2UsImp0aSI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImlhdCI6MTAwLCJleHAiOjIwMH0." +
-                                    "BALHrlUmCWorj56-NiYsufIsaDmukoErSzS9ujglHLg");
+                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImJoYXNrYXIiLCJhZG1pbiI6ZmFsc2UsImp0aSI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImlhdCI6MTAwLCJleHAiOjIwMH0.kfU8YNqsZIuF9KdOjjMAcEJ13-IJPi-A1OpjSvnmvf8");
                 });
             }
 
@@ -122,9 +148,7 @@ class JWTUtilsTest {
             void adminUser() {
                 mockStaticMethodsAndTest(() -> {
                     Assertions.assertThat(jwtUtils.createJWT(userName, secret, true))
-                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
-                                    "eyJ1c2VybmFtZSI6ImJoYXNrYXIiLCJhZG1pbiI6dHJ1ZSwianRpIjoiMTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTExIiwiaWF0IjoxMDAsImV4cCI6MjAwfQ." +
-                                    "wBZ-6qWQsesc5IgaNCS-MBgA7Q54natY_jVJOguP3JY");
+                            .isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImJoYXNrYXIiLCJhZG1pbiI6dHJ1ZSwianRpIjoiMTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTExIiwiaWF0IjoxMDAsImV4cCI6MjAwfQ.ZflBdwbqKg-AHqUoMG1klY_hdqRzHjQxg43s_iYyVTI");
                 });
             }
 

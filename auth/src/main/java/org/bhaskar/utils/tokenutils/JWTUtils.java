@@ -3,6 +3,7 @@ package org.bhaskar.utils.tokenutils;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.InvalidKeyException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -31,27 +32,42 @@ public class JWTUtils {
     public String createJWT(@NotNull String username,
                             @NotNull String secret,
                             boolean isAdmin) throws IllegalArgumentException {
-
+        String result = "";
         if (secret.isEmpty()) {
             log.error("Empty secret");
-            return "";
+            return result;
+        }
+
+        byte[] decodedString = null;
+        try {
+            decodedString = Base64.getDecoder().decode(secret);
+        } catch (IllegalArgumentException e) {
+            log.error("Error while decoding:{}, exception:{}", secret, e.getMessage());
+            return result;
         }
 
         Key hmacKey = new SecretKeySpec(
-                Base64.getDecoder().decode(secret),
+                decodedString,
                 SignatureAlgorithm.HS256.getJcaName());
 
         long expirationMinutes = 20;
 
-        return Jwts.builder()
-                .claim("username", username)
-                .claim("admin", isAdmin)
-                .setId(UUID.randomUUID().toString())
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))
-                .signWith(hmacKey, SignatureAlgorithm.HS256)
-                .setHeaderParam("typ", Header.JWT_TYPE)
-                .compact();
+        try {
+            result = Jwts.builder()
+                    .claim("username", username)
+                    .claim("admin", isAdmin)
+                    .setId(UUID.randomUUID().toString())
+                    .setIssuedAt(Date.from(Instant.now()))
+                    .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))
+                    .signWith(hmacKey, SignatureAlgorithm.HS256)
+                    .setHeaderParam("typ", Header.JWT_TYPE)
+                    .compact();
+
+        } catch (InvalidKeyException e) {
+            log.error("Error while creating key:{}, exception:{}", hmacKey, e.getMessage());
+        }
+
+        return result;
     }
 
 }
