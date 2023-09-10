@@ -1,7 +1,7 @@
 package org.bhaskar.auth;
 
 import org.bhaskar.dao.User;
-import org.bhaskar.dto.LoginResponse;
+import org.bhaskar.response.dto.LoginResponse;
 import org.bhaskar.user.UserService;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils;
 import org.bhaskar.utils.http.headerutils.AuthHeaderUtils.BasicAuthCredentials;
@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(controllers = AuthController.class)
 class AuthControllerTest {
-    
+
     @MockBean
     private UserService userService;
 

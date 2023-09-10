@@ -1,4 +1,4 @@
-package org.bhaskar.dto;
+package org.bhaskar.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nonnull;
