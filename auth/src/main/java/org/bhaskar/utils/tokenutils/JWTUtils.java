@@ -1,24 +1,23 @@
 package org.bhaskar.utils.tokenutils;
 
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.InvalidKeyException;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 @Component
 public class JWTUtils {
+    @Autowired
+    private JWTWrapperInterface jwtWrapper;
+
     /**
      * Create a jwt token based {@code user} and {@code isAdmin} as claims
      * and signing the token using {@code secret}
@@ -31,43 +30,68 @@ public class JWTUtils {
      */
     public String createJWT(@NotNull String username,
                             @NotNull String secret,
-                            boolean isAdmin) throws IllegalArgumentException {
+                            boolean isAdmin) {
         String result = "";
         if (secret.isEmpty()) {
             log.error("Empty secret");
             return result;
         }
 
-        byte[] decodedString = null;
-        try {
-            decodedString = Base64.getDecoder().decode(secret);
-        } catch (IllegalArgumentException e) {
-            log.error("Error while decoding:{}, exception:{}", secret, e.getMessage());
+        Key hmacKey = getSigningKey(secret);
+        if (hmacKey == null) {
+            log.error("Empty or illegal signing key");
             return result;
         }
 
-        Key hmacKey = new SecretKeySpec(
-                decodedString,
-                SignatureAlgorithm.HS256.getJcaName());
-
-        long expirationMinutes = 20;
-
         try {
-            result = Jwts.builder()
-                    .claim("username", username)
-                    .claim("admin", isAdmin)
-                    .setId(UUID.randomUUID().toString())
-                    .setIssuedAt(Date.from(Instant.now()))
-                    .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))
-                    .signWith(hmacKey, SignatureAlgorithm.HS256)
-                    .setHeaderParam("typ", Header.JWT_TYPE)
-                    .compact();
-
+            result = jwtWrapper.generateJWTString(
+                    username,
+                    isAdmin,
+                    hmacKey
+            );
         } catch (InvalidKeyException e) {
             log.error("Error while creating key:{}, exception:{}", hmacKey, e.getMessage());
         }
 
         return result;
+    }
+
+    public boolean isValidJWT(@NotNull String token,
+                              @NotNull String secret) {
+        Key hmacKey = getSigningKey(secret);
+        if (hmacKey == null) {
+            log.error("Empty or illegal signing key");
+            return false;
+        }
+        try {
+            Jws<Claims> jwt = jwtWrapper.parseClaims(token, hmacKey);
+            log.info(jwt.toString());
+
+        } catch (
+                ExpiredJwtException
+                | UnsupportedJwtException
+                | MalformedJwtException
+                | SignatureException
+                | IllegalArgumentException e) {
+            log.error("Error while parsing jwt:{}", e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public @Nullable Key getSigningKey(@NotNull String secret) {
+        Key hmacKey = null;
+        byte[] decodedString = null;
+        try {
+            decodedString = Base64.getDecoder().decode(secret);
+        } catch (IllegalArgumentException e) {
+            log.error("Error while decoding:{}, exception:{}", secret, e.getMessage());
+            return hmacKey;
+        }
+        hmacKey = new SecretKeySpec(
+                decodedString,
+                SignatureAlgorithm.HS256.getJcaName());
+        return hmacKey;
     }
 
 }
